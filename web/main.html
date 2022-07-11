@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>RouteSpy</title>
+<link rel="stylesheet" href="/bootstrap.css" >
+<script type="text/javascript" src="/jquery-3.4.1.js"></script>
+<script type="text/javascript" src="/bootstrap.js"></script>
+<script type="text/javascript" src="/eel.js"></script>        
+
+<script>
+    
+    
+
+    async function start() 
+    {
+      eel.start_packet_capture();
+    }
+    
+    eel.expose(updateData);
+    
+    function updateData(coords) 
+    {
+      let path = [];
+
+      for(let i = 0; i < coords.length; i+=2) {
+        path.push([coords[i], coords[i + 1],1]);        
+      }
+
+      const lineString = new ol.geom.LineString(path);
+      lineString.transform('EPSG:4326', 'EPSG:3857');
+      const feature = new ol.Feature({
+        geometry: lineString
+      });
+
+      source.addFeature(feature);
+
+      last_coord = [ coords[coords.length - 2],coords[coords.length - 1]]; 
+      var markerGeometry = new ol.geom.Point(last_coord);
+      markerGeometry.transform('EPSG:4326', 'EPSG:3857');
+      var markerFeature = new ol.Feature({
+          geometry: markerGeometry
+      });
+
+      vectorSource.addFeature(markerFeature);
+      /*
+      var markerStyle = new ol.style.Icon(({
+          src: 'https://github.com/openlayers/openlayers/blob/v3.20.1/examples/resources/logo-70x70.png'
+      }));
+
+      markerFeature.setStyle(new ol.style.Style({
+          image: markerStyle,
+      }));
+      */
+    }  
+      
+    $( document ).ready(function() {        
+        start();    
+    });
+    
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/css/ol.css" type="text/css">
+<style>
+.map {
+    height: 100%;
+    width: 100%;
+}
+#a { display: none; }
+</style>
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/build/ol.js"></script>
+<title>OL - LineString From Coords</title>
+
+
+
+</head>
+<body>
+
+    <h2>LineString From Coords</h2>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+      
+      // tile layer
+      var tile = new ol.layer.Tile({
+        source: new ol.source.OSM()
+      });
+
+      
+      
+      const source = new ol.source.Vector();
+      
+      var vector = new ol.layer.Vector({
+        source,
+        style: new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'green',
+            width: 2
+          })
+        })
+      })
+
+
+
+
+
+      const vectorSource = new ol.source.Vector();
+
+      var markerLayer = new ol.layer.Vector({
+          title: "RoutePoint",
+          visible: true,
+          source: vectorSource
+      });
+
+
+
+      
+
+
+      var map = new ol.Map({
+        layers: [
+          tile,
+          vector,
+          markerLayer
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: ol.proj.fromLonLat([40.86577525616522, 14.269432720014024]),
+          zoom: 10
+        })
+      });
+      
+
+    </script>
+</body>
+</html>
