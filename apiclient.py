@@ -6,12 +6,13 @@ from http import HTTPStatus
 
 import sqlite3 as sl
 
-APIKEY = "b3cb43a02d0d41b3bb65c76a54d4857d"
-APIURL = "https://api.ipgeolocation.io/ipgeo"
+
 
 class ApiClient:
-    
-    def __init__(self):
+
+    def __init__(self,url,key):
+        self.APIKEY = key
+        self.APIURL = url
         self.conn = sl.connect("ipdb.db", check_same_thread=False)
         c = self.conn.cursor()
         c.execute(
@@ -30,9 +31,9 @@ class ApiClient:
             else:
                 return None
 
-        url = APIURL
+        url = self.APIURL
         params = dict(
-            apiKey=APIKEY,
+            apiKey= self.APIKEY,
             ip=ip
         )
         resp = requests.get(url=url, params=params)
@@ -50,9 +51,9 @@ class ApiClient:
         return data
     
     def get_location(self):
-        url = APIURL
+        url = self.APIURL
         params = dict(
-            apiKey=APIKEY
+            apiKey= self.APIKEY
         )
         resp = requests.get(url=url, params=params)
         data = resp.json() 
